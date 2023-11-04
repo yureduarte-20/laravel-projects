@@ -1,7 +1,7 @@
 <script setup>
 
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import TableService from "@/Pages/Services/Components/TableService.vue";
+import TableService from "@/Pages/Admin/Services/Components/TableService.vue";
 import {router} from "@inertiajs/vue3";
 
 
@@ -20,8 +20,8 @@ const handleDelete = id => {
             window.alert('Error', JSON.stringify(params) )
         }
     })
-
 }
+const handleEdit = id =>  router.get(route('barberService.edit', id))
 </script>
 
 <template>
@@ -33,7 +33,7 @@ const handleDelete = id => {
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-2">
-                        <TableService :services="services" @deleteRequest="handleDelete"/>
+                        <TableService :services="services" @deleteRequest="handleDelete" @edit-request="handleEdit"/>
                     </div>
                 </div>
             </div>

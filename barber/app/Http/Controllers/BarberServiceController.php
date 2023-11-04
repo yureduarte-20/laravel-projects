@@ -27,7 +27,7 @@ class BarberServiceController extends Controller
     public function index()
     {
 
-        return Inertia::render('Services/List', [
+        return Inertia::render('Admin/Services/List', [
             'services' => BarberService::all()
         ]);
     }
@@ -38,7 +38,7 @@ class BarberServiceController extends Controller
     public function create()
     {
 
-        return Inertia::render('Services/Create', [
+        return Inertia::render('Admin/Services/Create', [
 
         ]);
     }
@@ -67,7 +67,7 @@ class BarberServiceController extends Controller
     public function show(BarberService $barberService)
     {
 
-        return Inertia::render('Services/Show', [
+        return Inertia::render('Admin/Services/Show', [
            'service' => $barberService
         ]);
     }
@@ -77,7 +77,7 @@ class BarberServiceController extends Controller
      */
     public function edit(BarberService $barberService)
     {
-        return Inertia::render('Services/Edit', [
+        return Inertia::render('Admin/Services/Edit', [
             'service' => $barberService
         ]);
     }
@@ -91,10 +91,10 @@ class BarberServiceController extends Controller
         $barberService->fill($validated);
 
         if($barberService->save()){
-            session()->flash('notification',  'Serviço editado com sucesso!');
+            session()->flash('notification',  [ 'type' => 'success', 'content' =>  'Serviço editado com sucesso!']);
             return Redirect::to(route('barberService.index'));
         }
-        session()->flash('notification',  'Erro ao tentar criar o serviço');
+        session()->flash('notification',  [ 'type' => 'error', 'content' =>  'Erro ao tentar criar o serviço']);
         return Redirect::to(route('barberService.index'));
     }
 
@@ -104,7 +104,7 @@ class BarberServiceController extends Controller
     public function destroy(BarberService $barberService)
     {
         BarberService::destroy($barberService->id);
-        Session::flash('notification', 'Serviço criado com sucesso!');
+        Session::flash('notification', ['type' => 'success', 'content' => 'Serviço deletado com sucesso!' ]);
         return Redirect::to(route('barberService.index'));
     }
 }

@@ -36,6 +36,9 @@ const showingNavigationDropdown = ref(false);
                                 <NavLink :href="route('barberService.index')" :active="route().current('barberService.index')">
                                     Serviços
                                 </NavLink>
+                                <NavLink :href="route('barber.index')" :active="route().current('barber.index')">
+                                   Barbeiros
+                                </NavLink>
                             </div>
                         </div>
 
@@ -149,8 +152,8 @@ const showingNavigationDropdown = ref(false);
 
             <!-- Page Content -->
             <main>
-                <Alert v-if="$page.props.flash.notification" type="info" >
-                    <span>{{$page.props.flash.notification}}</span>
+                <Alert v-if="$page.props.flash.notification" :type="$page.props.flash.notification.type" >
+                    <span>{{$page.props.flash.notification.content}}</span>
                 </Alert>
                 <slot />
             </main>
