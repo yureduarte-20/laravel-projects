@@ -3,9 +3,9 @@
 /public/build
 /public/hot
 /public/storage
-!/vendor/laravel/sail/runtimes/8.2
 /storage/*.key
 /vendor
+!/vendor/laravel/sail/*
 .env
 .env.backup
 .env.production
