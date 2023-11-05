@@ -10,7 +10,6 @@ import InputError from "@/Components/InputError.vue";
 const formSubmit = useForm({
     name: '',
     email: '',
-    phone: '',
     salary: 0.0,
     password: '',
     confirmPassword: ''
@@ -25,14 +24,14 @@ const handleSubimit = () => {
 <template>
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Serviços Prestados pela Barbearia</h2>
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Criar Barbeiro</h2>
         </template>
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
                 <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
                     <form @submit.prevent="handleSubimit" class="mt-6 space-y-6">
                         <div class="w-full flex gap-2">
-                            <div class="w-2/4">
+                            <div class="w-3/4">
                                 <InputLabel class="w-full"  value="Nome"/>
                                 <TextInput class="w-full" required v-model="formSubmit.name"/>
                                 <InputError v-if="formSubmit.errors.name" :message="formSubmit.errors.name" />
@@ -42,11 +41,6 @@ const handleSubimit = () => {
                                 <TextInput class="w-full" type="number" required step="0.01" min="0.00"
                                            v-model="formSubmit.salary"/>
                                 <InputError v-if="formSubmit.errors.salary" :message="formSubmit.errors.salary" />
-                            </div>
-                            <div class="w-1/4">
-                                <InputLabel class="w-full"  value="Telefone"/>
-                                <TextInput type="text" class="w-full" v-model="formSubmit.phone"/>
-                                <InputError v-if="formSubmit.errors.phone" :message="formSubmit.errors.phone" />
                             </div>
                         </div>
                         <div class="w-full flex gap-2">

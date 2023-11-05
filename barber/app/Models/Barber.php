@@ -25,4 +25,9 @@ class Barber extends Model
     public function appointment() : HasMany {
         return $this->hasMany(Appointment::class);
     }
+    protected static function booted () {
+        static::deleting(function(Barber $user) { // before delete() method call this
+            $user->user()->delete();
+        });
+    }
 }

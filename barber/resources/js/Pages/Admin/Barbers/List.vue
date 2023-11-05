@@ -23,6 +23,7 @@ const handleDelete = id => {
     })
 }
 const handleEdit = id =>  router.get(route('barber.edit', id))
+const handleShow = id =>  router.get(route('barber.show', id))
 </script>
 
 <template>
@@ -34,7 +35,10 @@ const handleEdit = id =>  router.get(route('barber.edit', id))
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-2">
-                        <TableBarbers :barbers="barbers" @deleteRequest="handleDelete" @edit-request="handleEdit"/>
+                        <TableBarbers :barbers="barbers"
+                                      @view-request="handleShow"
+                                      @deleteRequest="handleDelete"
+                                      @edit-request="handleEdit"/>
                     </div>
                 </div>
             </div>

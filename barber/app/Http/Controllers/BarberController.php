@@ -6,6 +6,7 @@ use App\Models\Barber;
 use App\Models\User;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
@@ -16,8 +17,7 @@ class BarberController extends Controller
     protected $rules = [
         'email' => 'unique:users,email|required|string',
         'password' => 'string|min:8',
-        'confirmPassword'=>'string|min:8|same:password',
-        'phone' => 'nullable',
+        'confirmPassword' => 'string|min:8|same:password',
         'name' => 'string|min:3',
         'salary' => 'numeric|min:0'
     ];
@@ -32,6 +32,7 @@ class BarberController extends Controller
             'min' => 'Seu nome deve ter no mínimo 3 caracteres'
         ]
     ];
+
     public function __construct(
         protected NotificationService $notificationService
     )
@@ -47,7 +48,7 @@ class BarberController extends Controller
         $barbers = Barber::with('user')->get()
             ->map(fn(Barber $barber) => [...$barber->only(['salary', 'id']), ...$barber->user->only(['email', 'name', 'phone'])]);
 
-        return Inertia::render('Admin/Barbers/List', [ 'barbers' => $barbers]);
+        return Inertia::render('Admin/Barbers/List', ['barbers' => $barbers]);
     }
 
     /**
@@ -63,12 +64,12 @@ class BarberController extends Controller
      */
     public function store(Request $request)
     {
-            $validated = $request->validate($this->rules, $this->rulesMessage);
-        try{
+        $validated = $request->validate($this->rules, $this->rulesMessage);
+        try {
             DB::beginTransaction();
             $barber = Barber::newModelInstance();
             $barber->fill($validated);
-            if($barber->save()){
+            if ($barber->save()) {
                 $barber->user()->save(new User([...$validated, 'password' => Hash::make($validated['password'])]));
                 $this->notificationService->writeSuccessNotification('Barbeiro criado com sucesso');
                 DB::commit();
@@ -77,7 +78,7 @@ class BarberController extends Controller
             DB::rollBack();
             $this->notificationService->writeDangerNotification('Erro ao tentar criar o barbeiro.');
             return Redirect::to(route('barber.index'));
-        } catch (\Exception $e){
+        } catch (\Exception $e) {
             DB::rollBack();
             $this->notificationService->writeDangerNotification('Erro ao tentar criar o barbeiro.');
             return Redirect::to(route('barber.index'));
@@ -89,7 +90,11 @@ class BarberController extends Controller
      */
     public function show(Barber $barber)
     {
-        //
+        return Inertia::render('Admin/Barbers/Show', [
+            'barber' => [...$barber->toArray(),
+                ...Collection::make($barber->user)->only(['name', 'email', 'role']),
+                'appointments' => $barber->appointment()->count()]
+        ]);
     }
 
     /**
@@ -97,7 +102,9 @@ class BarberController extends Controller
      */
     public function edit(Barber $barber)
     {
-        //
+        return Inertia::render('Admin/Barbers/Edit', ['barber' => [
+            ...$barber->toArray(),
+            ...Collection::make($barber->user)->only(['name', 'email', 'role']),]]);
     }
 
     /**
@@ -105,7 +112,28 @@ class BarberController extends Controller
      */
     public function update(Request $request, Barber $barber)
     {
-        //
+        $validated = $request->validate([
+            'password' => 'nullable|min:8',
+            'confirmPassword' => 'nullable|min:8|same:password',
+            'name' => 'min:3|required',
+            'salary' => 'numeric|min:0|required'
+        ]);
+        $barber->fill($validated);
+        $user = $barber->user;
+
+        $user->fill([
+            'name' => $validated['name'],
+            'salary' => $validated['salary']]);
+        if (!empty($validated['password'])) {
+            $user->password = Hash::make($validated['password']);
+        }
+        if ($barber->save()) {
+            $user->save();
+            $this->notificationService->writeSuccessNotification('Barbeiro editado com sucesso');
+        } else {
+            $this->notificationService->writeDangerNotification('Erro ao tentar salver o barbeiro.');
+        }
+        return Redirect::to(route('barber.index'));
     }
 
     /**

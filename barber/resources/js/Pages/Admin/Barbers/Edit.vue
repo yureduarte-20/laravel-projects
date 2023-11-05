@@ -1,25 +1,26 @@
 <script setup>
 
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
+import {router, useForm} from "@inertiajs/vue3";
 import TextInput from "@/Components/TextInput.vue";
-import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
-import {useForm} from "@inertiajs/vue3";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+import InputError from "@/Components/InputError.vue";
 const props = defineProps({
-    service: {
-        type: Object,
-        required: true
+    barber: {
+        required: true,
+        type: Object
     }
 })
 const formSubmit = useForm({
-    price: props.service.price,
-    description: props.service.description,
-    name: props.service.name
+    name: props.barber.name,
+    salary: props.barber.salary,
+    password: '',
+    confirmPassword: ''
 })
-const handleSubimit = () =>{
-    formSubmit.put(route('barberService.update', props.service.id), {
-        onError: console.error
+const handleSubimit = () => {
+    formSubmit.put(route('barber.update', props.barber.id), {
+        onSuccess: () => console.log('Criado sem problemas')
     })
 }
 </script>
@@ -27,7 +28,7 @@ const handleSubimit = () =>{
 <template>
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Editar Serviço "{{service.name}}"</h2>
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Editar Barbeiro</h2>
         </template>
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
@@ -40,17 +41,31 @@ const handleSubimit = () =>{
                                 <InputError v-if="formSubmit.errors.name" :message="formSubmit.errors.name" />
                             </div>
                             <div class="w-1/4">
-                                <InputLabel class="w-full" value="Preço"/>
+                                <InputLabel class="w-full" value="Salário"/>
                                 <TextInput class="w-full" type="number" required step="0.01" min="0.00"
-                                           v-model="formSubmit.price"/>
-                                <InputError v-if="formSubmit.errors.price" :message="formSubmit.errors.price" />
+                                           v-model="formSubmit.salary"/>
+                                <InputError v-if="formSubmit.errors.salary" :message="formSubmit.errors.salary" />
                             </div>
                         </div>
-                        <InputLabel class="w-full" value="Descrição"/>
-                        <textarea
-                            @input="formSubmit.description = $event.target.value"
-                            v-model="formSubmit.description" required class="w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"></textarea>
-                        <InputError v-if="formSubmit.errors.price"  :message="formSubmit.errors.description" />
+                        <div class="w-full flex gap-2">
+                            <div class="w-2/4">
+                                <InputLabel class="w-full" value="email - Não pode ser alterado"/>
+                                <TextInput class="w-full" type="email" disabled step="0.01" min="0.00"
+                                           v-model="props.barber.email"/>
+                            </div>
+                            <div class="w-1/4">
+                                <InputLabel class="w-full" value="Senha"/>
+                                <TextInput class="w-full" type="password"
+                                           v-model="formSubmit.password"/>
+                                <InputError v-if="formSubmit.errors.password" :message="formSubmit.errors.password" />
+                            </div>
+                            <div class="w-1/4">
+                                <InputLabel class="w-full" value="Confirmar Senha"/>
+                                <TextInput class="w-full" type="password"
+                                           v-model="formSubmit.confirmPassword"/>
+                                <InputError v-if="formSubmit.errors.confirmPassword" :message="formSubmit.errors.confirmPassword" />
+                            </div>
+                        </div>
                         <PrimaryButton type="submit">Enviar</PrimaryButton>
                     </form>
                 </div>
