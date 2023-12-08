@@ -14,6 +14,8 @@ use Laravel\Sanctum\HasApiTokens;
  */
 class User extends Authenticatable
 {
+    public static $ROLE_ADMIN = 'admin';
+    public static $ROLE_USER = 'user';
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
@@ -50,5 +52,8 @@ class User extends Authenticatable
 
     public function rentals() : HasMany {
         return $this->hasMany(Rental::class);
+    }
+    public function is_admin(){
+        return $this->role == self::$ROLE_ADMIN;
     }
 }
