@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enum\RolesEnum;
 use App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
@@ -43,7 +44,7 @@ class UserResource extends Resource
                     ->rules([
                         function ($get) {
                          return function (string $atribute, $value, \Closure $fail) use ($get){
-                             if($get('roles') == Role::findByName('odontólogo')->id && count($value) <=0){
+                             if($get('roles') == Role::findByName(RolesEnum::ODONTOLOGO->name)->id && count($value) <=0){
                                 $fail('Para odontólogos é obrigatório adicionar suas especialidades');
                              }
                          };

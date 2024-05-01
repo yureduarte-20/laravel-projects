@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enum\RolesEnum;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -16,8 +17,8 @@ class UserSeed extends Seeder
      */
     public function run(): void
     {
-        $admin = Role::findOrCreate('admin');
+        $admin = Role::findOrCreate(RolesEnum::ADMIN->name);
         $user = User::create([ 'name' => 'yure', 'email' => 'yure@gmail.com', 'password' => Hash::make('12345678') ]);
-        $user->assignRole('admin');
+        $user->assignRole(RolesEnum::ADMIN->name);
     }
 }

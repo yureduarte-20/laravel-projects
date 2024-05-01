@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enum\RolesEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -46,10 +47,18 @@ class User extends Authenticatable implements FilamentUser
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+    public function is_admin(): bool
+    {
+        return $this->hasRole(RolesEnum::ADMIN->name);
+    }
+    public function is_odontologo() : bool
+    {
+        return $this->hasRole(RolesEnum::ODONTOLOGO->name);
+    }
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return true;
+        return $this->is_admin() || $this->is_odontologo();
     }
 
     public function especialidades() : BelongsToMany
