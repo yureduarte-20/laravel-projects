@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class DisponibilidadeHorario extends Model
 {
@@ -15,5 +16,9 @@ class DisponibilidadeHorario extends Model
     public function disponibilidade(): BelongsTo
     {
         return $this->belongsTo(Disponibilidade::class);
+    }
+    public function consultas(): HasMany
+    {
+        return $this->hasMany(Consulta::class);
     }
 }

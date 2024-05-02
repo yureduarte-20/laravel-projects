@@ -6,6 +6,7 @@ use App\Enum\RolesEnum;
 use App\Enum\Semanas;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 
 class AgendasSeed extends Seeder
@@ -22,7 +23,17 @@ class AgendasSeed extends Seeder
         ]);
         $dr->assignRole(RolesEnum::ODONTOLOGO->name);
         $agenda = $dr->agenda()->create();
-        $disponibilidade = $agenda->disponibilidades()->create([ 'disponibilidade_semana' => Semanas::QUI ]);
-        $disponibilidade->horarios()->create([ 'horario_inicio' => '08:00:00', 'horario_final' => '12:00:00' ]);
+        $disponibilidade = $agenda->disponibilidades()->create(['disponibilidade_semana' => Semanas::QUI]);
+        $startTime = Carbon::parse('08:00');
+        $endTime = Carbon::parse('12:00');
+        $timeRange = [];
+        $currentTime = $startTime;
+        while ($currentTime <= $endTime) {
+            $timeRange[] = $currentTime->toTimeString();
+            $currentTime->addMinutes(30);
+        }
+        foreach($timeRange as $time){
+            $disponibilidade->horarios()->create([ 'horario' => $time ]);
+        }
     }
 }

@@ -14,8 +14,7 @@ return new class extends Migration
     {
         Schema::create('disponibilidade_horarios', function (Blueprint $table) {
             $table->id();
-            $table->time('horario_inicio');
-            $table->time('horario_final');
+            $table->time('horario');
             $table->foreignIdFor(Disponibilidade::class)->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
