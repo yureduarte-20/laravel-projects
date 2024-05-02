@@ -3,17 +3,13 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\EspecialidadeResource\Pages;
-use App\Filament\Resources\EspecialidadeResource\RelationManagers;
 use App\Models\Especialidade;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Support\View\Components\Modal;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Collection;
 
 class EspecialidadeResource extends Resource
@@ -61,23 +57,27 @@ class EspecialidadeResource extends Resource
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()
                     ->requiresConfirmation()
-                    ->action(fn(Especialidade $e) => $e->has('users')->exists() ?
+                    ->action(fn (Especialidade $e) => $e->has('users')->exists() ?
                         Notification::make()
                             ->title('Não é possível apagar especialidade com usuários cadastrados!')
                             ->danger()
                             ->send()
-                        : $e->delete())
+                        : $e->delete()),
 
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
                         ->action(function (Collection $record) {
-                            if (!auth()->user()->is_admin()) return Notification::make()
-                                ->danger()->title('Você não possui autorização para isso')->send();
-                            if($record->some(fn(Especialidade $e) => $e->has('users')->exists()))
+                            if (! auth()->user()->is_admin()) {
+                                return Notification::make()
+                                    ->danger()->title('Você não possui autorização para isso')->send();
+                            }
+                            if ($record->some(fn (Especialidade $e) => $e->has('users')->exists())) {
                                 return Notification::make()
                                     ->danger()->title('Não é possível apagar especialidade com usuários cadastrados! ')->send();
+                            }
+
                             return $record->each->delete();
                         }),
                 ]),

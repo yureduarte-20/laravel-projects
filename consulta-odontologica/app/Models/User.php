@@ -4,18 +4,18 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Enum\RolesEnum;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
-use Filament\Models\Contracts\FilamentUser;
-use Filament\Panel;
 
 class User extends Authenticatable implements FilamentUser
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles;
+    use HasApiTokens, HasFactory, HasRoles, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -47,13 +47,20 @@ class User extends Authenticatable implements FilamentUser
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
     public function is_admin(): bool
     {
         return $this->hasRole(RolesEnum::ADMIN->name);
     }
-    public function is_odontologo() : bool
+
+    public function is_odontologo(): bool
     {
         return $this->hasRole(RolesEnum::ODONTOLOGO->name);
+    }
+
+    public function is_paciente()
+    {
+        return $this->hasRole(RolesEnum::PACIENTE->name);
     }
 
     public function canAccessPanel(Panel $panel): bool
@@ -61,10 +68,15 @@ class User extends Authenticatable implements FilamentUser
         return $this->is_admin() || $this->is_odontologo();
     }
 
-    public function especialidades() : BelongsToMany
+    public function especialidades(): BelongsToMany
     {
         return $this->belongsToMany(Especialidade::class)
             ->using(EspecialidadeUser::class)
             ->withTimestamps();
+    }
+
+    public function agenda()
+    {
+        return $this->hasOne(Agenda::class);
     }
 }

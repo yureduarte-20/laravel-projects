@@ -4,14 +4,16 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Especialidade;
-use Illuminate\Http\Request;
+use App\Service\AgendamentosService;
 
 class EspecialidadeController extends Controller
 {
-    public function __construct()
-    {
+    public function __construct(
+        private AgendamentosService $agendamentos
+    ) {
         $this->authorizeResource(Especialidade::class, 'especialidade');
     }
+
     /**
      * Display a listing of the resource.
      */
@@ -20,7 +22,6 @@ class EspecialidadeController extends Controller
         return Especialidade::paginate(20)->withQueryString();
     }
 
-
     /**
      * Display the specified resource.
      */
@@ -28,5 +29,4 @@ class EspecialidadeController extends Controller
     {
         return Especialidade::find($especialidade);
     }
-
 }

@@ -6,7 +6,6 @@ use App\Enum\RolesEnum;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Validation\ValidationException;
@@ -18,15 +17,15 @@ class UserController extends Controller
     {
         $validated = $request->validate([
             'email' => 'required|email|exists:users',
-            'password' => 'string|required'
+            'password' => 'string|required',
         ], [
             'email.email' => 'Precisa ser um email',
             'email.exists' => 'Usuário não encontrado',
-            'password' => 'Senha obrigatória'
+            'password' => 'Senha obrigatória',
         ]);
         $user = User::where('email', $validated['email'])->with('roles')->first();
         if (Hash::check($validated['password'], $user->password)) {
-            return ['token' => $user->createToken('access_token', $user->roles->map(fn(Role $role) => $role->name)->toArray())->plainTextToken];
+            return ['token' => $user->createToken('access_token', $user->roles->map(fn (Role $role) => $role->name)->toArray())->plainTextToken];
         }
         throw ValidationException::withMessages([
             'password' => ['As credenciais fornecidas estao incorretas'],
@@ -38,26 +37,27 @@ class UserController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|min:3',
             'password' => 'required|confirmed|string|min:8',
-            'email' => 'required|email|unique:users'
+            'email' => 'required|email|unique:users',
         ], [
             'name' => [
                 'string' => 'O nome precisa ser um texto.',
                 'min' => 'É necessário no mínimo 3 caracteres.',
-                'required' => 'O campo nome é obrigatório.'
+                'required' => 'O campo nome é obrigatório.',
             ],
             'password' => [
                 'confirmed' => 'As senhas não coicidem.',
                 'string' => 'A senha precisa ser um texto.',
-                'min' => 'A senha precisa ter no mínimo 8 caracteres.'
+                'min' => 'A senha precisa ter no mínimo 8 caracteres.',
             ],
             'email' => [
                 'unique' => 'Este email já esta sendo utilizado.',
-                'required' => 'O email é obrigatório.'
-            ]
+                'required' => 'O email é obrigatório.',
+            ],
         ]);
         $user = User::create($validated);
         $user->assignRole(RolesEnum::PACIENTE->name);
+
         return Response::json(['token' => $user->createToken('access_token',
-            $user->roles->map(fn(Role $role) => $role->name)->toArray())->plainTextToken], 201);
+            $user->roles->map(fn (Role $role) => $role->name)->toArray())->plainTextToken], 201);
     }
 }
