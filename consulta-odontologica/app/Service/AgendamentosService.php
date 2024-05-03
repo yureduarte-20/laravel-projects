@@ -35,7 +35,10 @@ class AgendamentosService
         $dias = Semanas::cases();
         $dia_semana = $dias[$dia->dayOfWeek];
         
-        if($agenda->disponibilidade()->where([ 'dia_semana' => $dia_semana->name,  ])->exists() )
+        if(!$agenda->disponibilidade()->where([ 'dia_semana' => $dia_semana->name  ])->exists()){
+            throw new SemHorariosDisponivelException();
+        }
+        
         
     }
 }

@@ -6,7 +6,7 @@ use WendellAdriel\ValidatedDTO\ValidatedDTO;
 
 class AgendamentoDTO extends ValidatedDTO
 {
-    public string $horario;
+    public string $dia;
 
     public $especialidade_id;
 
@@ -19,8 +19,8 @@ class AgendamentoDTO extends ValidatedDTO
         return [
             'user_id' => ['exists:users,id', 'required'],
             'agenda_id' => ['exists:agendas,id', 'required'],
-            'horario' => ['required', 'date'],
-            'especialidade_id' => ['required', 'exists:especialidades,id']
+            'dia' => ['required', 'date'],
+            'especialidade_id' => ['required', 'exists:especialidades,id'],
         ];
     }
 

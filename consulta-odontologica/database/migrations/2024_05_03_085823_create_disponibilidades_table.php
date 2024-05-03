@@ -14,7 +14,7 @@ return new class extends Migration
     {
         Schema::create('disponibilidades', function (Blueprint $table) {
             $table->id();
-            $table->enum('dia_semana', collect(Semanas::cases())->map(fn(Semanas $sem ) => $sem->name )->toArray() );
+            $table->enum('dia_semana', collect(Semanas::cases())->map(fn (Semanas $sem) => $sem->name)->toArray());
             $table->time('horario');
             $table->timestamps();
         });

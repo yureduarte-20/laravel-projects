@@ -18,6 +18,7 @@ return new class extends Migration
 
             $table->foreignIdFor(Disponibilidade::class)->constrained();
             $table->foreignIdFor(Agenda::class)->constrained()->cascadeOnDelete();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

@@ -77,7 +77,7 @@ class EspecialidadesSeed extends Seeder
             Especialidade::firstOrCreate([
                 'nome' => $item['especialidade'],
                 'descricao' => $item['descricao'],
-                'tempo_medio_consulta_minutos' => $item['tempo_medio_consulta']
+                'tempo_medio_consulta_minutos' => $item['tempo_medio_consulta'],
             ]);
         });
     }

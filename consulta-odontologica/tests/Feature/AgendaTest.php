@@ -11,12 +11,12 @@ use App\Models\Especialidade;
 use App\Models\User;
 use App\Service\AgendamentosService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class AgendaTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * A basic feature test example.
      */
@@ -57,8 +57,7 @@ class AgendaTest extends TestCase
             'user_id' => $paciente->id,
             'agenda_id' => User::first()->id,
             'especialidade_id' => Especialidade::first()->id,
-            'horario' => '10/10/2024',
-          //  'disponibilidade_horario_id' => DisponibilidadeHorario::first()->id,
+            'dia' => '24-04-2024 09:00',
         ]);
         $this->app->bind(AgendamentosService::class, fn () => new AgendamentosService);
         $agendamentosService = $this->app->get(AgendamentosService::class);

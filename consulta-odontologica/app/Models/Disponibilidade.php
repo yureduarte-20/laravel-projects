@@ -14,7 +14,8 @@ class Disponibilidade extends Model
     protected $fillable = ['dia_semana', 'horario'];
     public function agendas() : BelongsToMany
     {
-        return $this->belongsToMany(Agenda::class);
+        return $this->belongsToMany(Agenda::class)
+        ->using(AgendaDisponibilidade::class)->withTimestamps();
     }
     protected $casts = [  
         'dia_semana' => Semanas::class

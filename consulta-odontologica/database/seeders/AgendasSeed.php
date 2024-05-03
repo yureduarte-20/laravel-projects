@@ -24,7 +24,7 @@ class AgendasSeed extends Seeder
         ]);
         $dr->assignRole(RolesEnum::ODONTOLOGO->name);
         $agenda = $dr->agenda()->create();
-        
+
         $startTime = Carbon::parse('08:00');
         $endTime = Carbon::parse('18:00');
         $timeRange = [];
@@ -34,12 +34,16 @@ class AgendasSeed extends Seeder
             $currentTime->addMinutes(30);
         }
         foreach (Semanas::cases() as $semana) {
-            foreach($timeRange as $time){
+            foreach ($timeRange as $time) {
                 Disponibilidade::create([
                     'dia_semana' => $semana,
-                    'horario' => $time
+                    'horario' => $time,
                 ]);
             }
         }
+        $ag = Disponibilidade::whereIn('dia_semana', [Semanas::SEG->name, Semanas::TER->name])
+            ->whereBetween('horario', ['08:00:00', '09:00:00'])->get();
+        $agenda->disponibilidade()->saveMany($ag);
+
     }
 }
