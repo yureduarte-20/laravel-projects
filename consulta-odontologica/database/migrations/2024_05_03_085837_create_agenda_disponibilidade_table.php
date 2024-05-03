@@ -1,9 +1,7 @@
 <?php
 
 use App\Models\Agenda;
-use App\Models\DisponibilidadeHorario;
-use App\Models\Especialidade;
-use App\Models\User;
+use App\Models\Disponibilidade;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,17 +13,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('consultas', function (Blueprint $table) {
+        Schema::create('agenda_disponibilidade', function (Blueprint $table) {
             $table->id();
 
-            $table->date('horario');
-
-
-            $table->foreignIdFor(Especialidade::class);
-
-            $table->foreignIdFor(DisponibilidadeHorario::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(Disponibilidade::class)->constrained();
             $table->foreignIdFor(Agenda::class)->constrained()->cascadeOnDelete();
-            $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }
@@ -35,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('consultas');
+        Schema::dropIfExists('agenda_disponibilidade');
     }
 };

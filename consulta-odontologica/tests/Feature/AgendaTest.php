@@ -58,7 +58,7 @@ class AgendaTest extends TestCase
             'agenda_id' => User::first()->id,
             'especialidade_id' => Especialidade::first()->id,
             'horario' => '10/10/2024',
-            'disponibilidade_horario_id' => DisponibilidadeHorario::first()->id,
+          //  'disponibilidade_horario_id' => DisponibilidadeHorario::first()->id,
         ]);
         $this->app->bind(AgendamentosService::class, fn () => new AgendamentosService);
         $agendamentosService = $this->app->get(AgendamentosService::class);

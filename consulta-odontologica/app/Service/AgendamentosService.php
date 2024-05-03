@@ -25,38 +25,17 @@ class AgendamentosService
     public function agendar(AgendamentoDTO $agendamento)
     {
         $paciente = User::find($agendamento->user_id);
-        $agenda = Agenda::find($agendamento->agenda_id);
         if (!$paciente->is_paciente()) {
             throw new AgendamentoUsuarioInvalidoException();
         }
+        $agenda = Agenda::find($agendamento->agenda_id);
+        
         $dia = Carbon::parse($agendamento->horario)->setTimezone(new \DateTimeZone('America/Santarem'));
         $dia = $dia->locale('pt_BR');
         $dias = Semanas::cases();
-
         $dia_semana = $dias[$dia->dayOfWeek];
-        $hora = $dia->format('H') . ':00:00';
-
-        // se o doutor atende nesse dia da semana
-        $exist = $agenda->whereHas('disponibilidades', function ($query) use ($hora, $dia_semana, $agendamento) {
-            $query->where('disponibilidade_semana', $dia_semana->name)
-                ->whereHas(
-                    'horarios',
-                    fn($query) => $query
-                        ->where('disponibilidade_horarios.id', '=', $agendamento->disponibilidade_horario_id)
-                );
-        })->exists();
-        if (!$exist)
-            throw new SemHorariosDisponivelException();
-        // se alguem já tem atendimento
-        $dia_semana = Disponibilidade::where('disponibilidade_semana', $dia_semana->name)->first();
-        $exist = Consulta::where(['disponibilidade_horario' => $agendamento->disponibilidade_horario_id])
-            ->whereDate('horario', $dia->format('Y-m-d'))
-            ->exists();
-        if ($exist) throw new SemHorariosDisponivelException("Não é possível agendar nesse horário");
-        $consulta = $paciente->consultas()->create([ 'horario' => $dia,
-        'agenda_id' => $agendamento->agenda_id ,
-        'disponibilidade_horario_id' => $agendamento->disponibilidade_horario_id,
-        'especialidade_id' => $agendamento->especialidade_id ]);
-        return $consulta;
+        
+        if($agenda->disponibilidade()->where([ 'dia_semana' => $dia_semana->name,  ])->exists() )
+        
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\Disponibilidade;
+use App\Enum\Semanas;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,10 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('disponibilidade_horarios', function (Blueprint $table) {
+        Schema::create('disponibilidades', function (Blueprint $table) {
             $table->id();
+            $table->enum('dia_semana', collect(Semanas::cases())->map(fn(Semanas $sem ) => $sem->name )->toArray() );
             $table->time('horario');
-            $table->foreignIdFor(Disponibilidade::class)->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('disponibilidade_horarios');
+        Schema::dropIfExists('disponibilidades');
     }
 };

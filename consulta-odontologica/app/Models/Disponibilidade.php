@@ -6,24 +6,17 @@ use App\Enum\Semanas;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Disponibilidade extends Model
 {
     use HasFactory;
-
-    protected $fillable = ['agenda_id', 'disponibilidade_semana'];
-
-    public function horarios(): HasMany
+    protected $fillable = ['dia_semana', 'horario'];
+    public function agendas() : BelongsToMany
     {
-        return $this->hasMany(DisponibilidadeHorario::class);
+        return $this->belongsToMany(Agenda::class);
     }
-
-    public function agenda(): BelongsTo
-    {
-        return $this->belongsTo(Agenda::class);
-    }
-    protected $casts =[
-        'disponibilidade_semana' => Semanas::class
-    ];
+    protected $casts = [  
+        'dia_semana' => Semanas::class
+     ];
 }

@@ -80,8 +80,4 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->hasOne(Agenda::class);
     }
-    public function consultas(): HasMany
-    {
-        return $this->hasMany(Consulta::class);
-    }
 }
