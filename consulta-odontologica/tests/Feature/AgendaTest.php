@@ -14,7 +14,6 @@ use App\Models\Horario;
 use App\Models\User;
 use App\Service\AgendamentosService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use PHPUnit\Framework\Attributes\Before;
 use Tests\TestCase;
 
 class AgendaTest extends TestCase
@@ -61,22 +60,22 @@ class AgendaTest extends TestCase
             'user_id' => $paciente->id,
             'agenda_id' => $agenda->id,
             'especialidade_id' => $agenda->user->especialidades[0]->id,
-            'horario_id' => Horario::whereDoesntHave('agendas', fn($query) => $query->where('agendas.id', $agenda->id))->first()->id,
+            'horario_id' => Horario::whereDoesntHave('agendas', fn ($query) => $query->where('agendas.id', $agenda->id))->first()->id,
             'dia' => '2024-04-24',
         ]);
-        $this->app->bind(AgendamentosService::class, fn() => new AgendamentosService);
+        $this->app->bind(AgendamentosService::class, fn () => new AgendamentosService);
         $agendamentosService = $this->app->get(AgendamentosService::class);
-        $this->assertThrows(fn() => $agendamentosService->agendar($agendamento), SemHorariosDisponivelException::class);
+        $this->assertThrows(fn () => $agendamentosService->agendar($agendamento), SemHorariosDisponivelException::class);
     }
+
     public function test_agendar_com_doutor_sem_especialidade()
     {
-        //TODO
         $this->seed();
         $paciente = User::factory()->create();
         $paciente->assignRole(RolesEnum::PACIENTE->name);
         $agenda = Agenda::first();
         $doutor = $agenda->user;
-        $especialidade = Especialidade::whereDoesntHave('users', fn($query) => $query->where('users.id', $doutor->id))->first();
+        $especialidade = Especialidade::whereDoesntHave('users', fn ($query) => $query->where('users.id', $doutor->id))->first();
         $agendamento = new AgendamentoDTO([
             'user_id' => $paciente->id,
             'agenda_id' => $agenda->id,
@@ -85,10 +84,11 @@ class AgendaTest extends TestCase
             'dia' => '2024-04-24',
         ]);
 
-        $this->app->bind(AgendamentosService::class, fn() => new AgendamentosService);
+        $this->app->bind(AgendamentosService::class, fn () => new AgendamentosService);
         $agendamentosService = $this->app->get(AgendamentosService::class);
-        $this->assertThrows(fn() => $agendamentosService->agendar($agendamento), OdontologoSemEspecialidadeException::class);
+        $this->assertThrows(fn () => $agendamentosService->agendar($agendamento), OdontologoSemEspecialidadeException::class);
     }
+
     public function test_agendar_em_horario_com_data_incorreta()
     {
         $this->seed();
@@ -96,7 +96,7 @@ class AgendaTest extends TestCase
         $paciente->assignRole(RolesEnum::PACIENTE->name);
         $agenda = Agenda::first();
         $doutor = $agenda->user;
-        $especialidade = Especialidade::whereHas('users', fn($query) => $query->where('users.id', $doutor->id))->first();
+        $especialidade = Especialidade::whereHas('users', fn ($query) => $query->where('users.id', $doutor->id))->first();
         $agendamento = new AgendamentoDTO([
             'user_id' => $paciente->id,
             'agenda_id' => $agenda->id,
@@ -104,10 +104,11 @@ class AgendaTest extends TestCase
             'horario_id' => $agenda->horarios()->where('dia_semana', Semanas::SEG->name)->first()->id,
             'dia' => '2024-04-24',
         ]);
-        $this->app->bind(AgendamentosService::class, fn() => new AgendamentosService);
+        $this->app->bind(AgendamentosService::class, fn () => new AgendamentosService);
         $agendamentosService = $this->app->get(AgendamentosService::class);
-        $this->assertThrows(fn() => $agendamentosService->agendar($agendamento), SemHorariosDisponivelException::class);
+        $this->assertThrows(fn () => $agendamentosService->agendar($agendamento), SemHorariosDisponivelException::class);
     }
+
     public function test_agendar_em_horario_com_data_correta()
     {
         $this->seed();
@@ -115,7 +116,7 @@ class AgendaTest extends TestCase
         $paciente->assignRole(RolesEnum::PACIENTE->name);
         $agenda = Agenda::first();
         $doutor = $agenda->user;
-        $especialidade = Especialidade::whereHas('users', fn($query) => $query->where('users.id', $doutor->id))->first();
+        $especialidade = Especialidade::whereHas('users', fn ($query) => $query->where('users.id', $doutor->id))->first();
         $agendamento = new AgendamentoDTO([
             'user_id' => $paciente->id,
             'agenda_id' => $agenda->id,
@@ -123,18 +124,93 @@ class AgendaTest extends TestCase
             'horario_id' => $agenda->horarios()->where('dia_semana', Semanas::SEG->name)->first()->id,
             'dia' => '2024-04-22',
         ]);
-        $this->app->bind(AgendamentosService::class, fn() => new AgendamentosService);
+        $this->app->bind(AgendamentosService::class, fn () => new AgendamentosService);
         $agendamentosService = $this->app->get(AgendamentosService::class);
         $consulta = $agendamentosService->agendar($agendamento);
-        $this->assertEquals($consulta->user_id,$paciente->id);
+        $this->assertEquals($consulta->user_id, $paciente->id);
         $this->assertEquals($consulta->especialidade_id, $especialidade->id);
         $this->assertEquals($consulta->agenda_id, $agenda->id);
         $this->assertEquals($consulta->dia->toDateString(), $agendamento->dia);
         $this->assertEquals($consulta->horario_id, $agendamento->horario_id);
         $this->assertEquals($consulta->status, StatusConsulta::AGENDADO);
     }
-    public function test_agendar_com_horario_ja_reservado()
+
+    public function test_agendar_horario_ja_reservado()
     {
-        //TODO
+        $this->seed();
+        $paciente = User::factory()->create();
+        $paciente->assignRole(RolesEnum::PACIENTE->name);
+        $agenda = Agenda::first();
+        $doutor = $agenda->user;
+        $especialidade = Especialidade::whereHas('users', fn ($query) => $query->where('users.id', $doutor->id))->first();
+        $dia = $agenda->horarios()->where('dia_semana', Semanas::SEG->name)->first();
+        $agendamento = new AgendamentoDTO([
+            'user_id' => $paciente->id,
+            'agenda_id' => $agenda->id,
+            'especialidade_id' => $especialidade->id,
+            'horario_id' => $dia->id,
+            'dia' => '2024-04-22',
+        ]);
+        $this->app->bind(AgendamentosService::class, fn () => new AgendamentosService);
+        $agendamentosService = $this->app->get(AgendamentosService::class);
+        $consulta = $agendamentosService->agendar($agendamento);
+        $this->assertEquals($consulta->user_id, $paciente->id);
+        $this->assertEquals($consulta->especialidade_id, $especialidade->id);
+        $this->assertEquals($consulta->agenda_id, $agenda->id);
+        $this->assertEquals($consulta->dia->toDateString(), $agendamento->dia);
+        $this->assertEquals($consulta->horario_id, $agendamento->horario_id);
+        $this->assertEquals($consulta->status, StatusConsulta::AGENDADO);
+
+        $paciente = User::factory()->create();
+        $paciente->assignRole(RolesEnum::PACIENTE->name);
+
+        $agendamento = new AgendamentoDTO([
+            'user_id' => $paciente->id,
+            'agenda_id' => $agenda->id,
+            'especialidade_id' => $especialidade->id,
+            'horario_id' => $dia->id,
+            'dia' => '2024-04-22',
+        ]);
+        $this->assertThrows(fn () => $agendamentosService->agendar($agendamento), SemHorariosDisponivelException::class, 'Já existe uma consulta para esse dia, escolha outro horário.');
+    }
+
+    public function test_agendar_horario_ja_reservado_com_especialidade_diferente()
+    {
+        $this->seed();
+        $paciente = User::factory()->create();
+        $paciente->assignRole(RolesEnum::PACIENTE->name);
+        $agenda = Agenda::first();
+        $doutor = $agenda->user;
+        $especialidade = Especialidade::whereHas('users', fn ($query) => $query->where('users.id', $doutor->id))->first();
+        $dia = $agenda->horarios()->where('dia_semana', Semanas::SEG->name)->first();
+        $agendamento = new AgendamentoDTO([
+            'user_id' => $paciente->id,
+            'agenda_id' => $agenda->id,
+            'especialidade_id' => $especialidade->id,
+            'horario_id' => $dia->id,
+            'dia' => '2024-04-22',
+        ]);
+        $this->app->bind(AgendamentosService::class, fn () => new AgendamentosService);
+        $agendamentosService = $this->app->get(AgendamentosService::class);
+        $consulta = $agendamentosService->agendar($agendamento);
+        $this->assertEquals($consulta->user_id, $paciente->id);
+        $this->assertEquals($consulta->especialidade_id, $especialidade->id);
+        $this->assertEquals($consulta->agenda_id, $agenda->id);
+        $this->assertEquals($consulta->dia->toDateString(), $agendamento->dia);
+        $this->assertEquals($consulta->horario_id, $agendamento->horario_id);
+        $this->assertEquals($consulta->status, StatusConsulta::AGENDADO);
+
+        $paciente = User::factory()->create();
+        $paciente->assignRole(RolesEnum::PACIENTE->name);
+        $especialidade = Especialidade::whereHas('users', fn ($query) => $query->where('users.id', $doutor->id))
+            ->whereNotIn('especialidades.id', [$especialidade->id])->first();
+        $agendamento = new AgendamentoDTO([
+            'user_id' => $paciente->id,
+            'agenda_id' => $agenda->id,
+            'especialidade_id' => $especialidade->id,
+            'horario_id' => $dia->id,
+            'dia' => '2024-04-22',
+        ]);
+        $this->assertThrows(fn () => $agendamentosService->agendar($agendamento), SemHorariosDisponivelException::class, 'Já existe uma consulta para esse dia, escolha outro horário.');
     }
 }

@@ -26,7 +26,7 @@ class AgendasSeed extends Seeder
         $dr->assignRole(RolesEnum::ODONTOLOGO->name);
         $agenda = $dr->agenda()->create();
         $especialidades = Especialidade::limit(2)->get();
-        $dr->especialidades()->sync( $especialidades->map(fn(Especialidade $esp) => $esp->id ) );
+        $dr->especialidades()->sync($especialidades->map(fn (Especialidade $esp) => $esp->id));
         $startTime = Carbon::parse('08:00');
         $endTime = Carbon::parse('18:00');
         $timeRange = [];

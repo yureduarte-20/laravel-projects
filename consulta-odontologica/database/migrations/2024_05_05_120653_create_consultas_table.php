@@ -20,7 +20,7 @@ return new class extends Migration
             $table->id();
             $table->date('dia');
 
-            $table->enum('status', array_map(fn($item) => $item->name, StatusConsulta::cases()))->default(StatusConsulta::AGENDADO->name);
+            $table->enum('status', array_map(fn ($item) => $item->name, StatusConsulta::cases()))->default(StatusConsulta::AGENDADO->name);
             $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(Agenda::class)->constrained();
             $table->foreignIdFor(Especialidade::class)->constrained();
