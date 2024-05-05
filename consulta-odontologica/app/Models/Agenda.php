@@ -22,9 +22,10 @@ class Agenda extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function disponibilidade(): BelongsToMany
+    public function horarios(): BelongsToMany
     {
-        return $this->belongsToMany(Disponibilidade::class)
-            ->using(AgendaDisponibilidade::class)->withTimestamps();
+        return $this->belongsToMany(Horario::class)
+            ->using(AgendaHorario::class)
+            ->withTimestamps();
     }
 }

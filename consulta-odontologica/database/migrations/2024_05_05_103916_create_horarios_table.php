@@ -12,10 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('disponibilidades', function (Blueprint $table) {
+        Schema::create('horarios', function (Blueprint $table) {
             $table->id();
-            $table->enum('dia_semana', collect(Semanas::cases())->map(fn (Semanas $sem) => $sem->name)->toArray());
             $table->time('horario');
+            $table->enum('dia_semana', array_map(fn ($item) => $item->name, Semanas::cases()));
             $table->timestamps();
         });
     }
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('disponibilidades');
+        Schema::dropIfExists('horarios');
     }
 };

@@ -10,6 +10,8 @@ class AgendamentoDTO extends ValidatedDTO
 
     public $especialidade_id;
 
+    public $horario_id;
+
     public $agenda_id;
 
     public $user_id;
@@ -21,6 +23,7 @@ class AgendamentoDTO extends ValidatedDTO
             'agenda_id' => ['exists:agendas,id', 'required'],
             'dia' => ['required', 'date'],
             'especialidade_id' => ['required', 'exists:especialidades,id'],
+            'horario_id' => ['required', 'exists:horarios,id'],
         ];
     }
 
