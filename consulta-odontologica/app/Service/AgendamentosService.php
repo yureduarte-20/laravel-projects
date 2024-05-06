@@ -5,6 +5,7 @@ namespace App\Service;
 use App\DTOs\AgendamentoDTO;
 use App\Enum\Semanas;
 use App\Enum\StatusConsulta;
+use App\Exceptions\AgendamentoDuplicadoException;
 use App\Exceptions\AgendamentoUsuarioInvalidoException;
 use App\Exceptions\OdontologoSemEspecialidadeException;
 use App\Exceptions\SemHorariosDisponivelException;
@@ -34,7 +35,7 @@ class AgendamentosService
         $dia_semana = $dias[$dia->dayOfWeek];
 
         if (! $agenda->horarios()->where(['horario_id' => $agendamento->horario_id])->exists()) {
-            throw new SemHorariosDisponivelException();
+            throw new SemHorariosDisponivelException("Odontólogo não possui horário disponível para esse dia.");
         }
         if (Consulta::where(['horario_id' => $agendamento->horario_id,
             'agenda_id' => $agendamento->agenda_id,
@@ -50,7 +51,9 @@ class AgendamentosService
         if ($dia_atendimento->dia_semana != $dia_semana) {
             throw new SemHorariosDisponivelException("O dia agendado não condiz com o dia da semana, {$agendamento->dia} é {$dia->dayOfWeek} {$dia_semana->name} e o horário solicitado é para {$dia_atendimento->dia_semana?->name}");
         }
-
+        if($paciente->consultas()->whereIn('status', [StatusConsulta::AGENDADO->name, StatusConsulta::ADIADA->name] )->exists()){
+            throw new AgendamentoDuplicadoException("Você tem consultas pendentes, portanto não pode realizar outra sem finalizar a anterior");
+        }
         return Consulta::create([
             'dia' => $agendamento->dia,
             'horario_id' => $agendamento->horario_id,

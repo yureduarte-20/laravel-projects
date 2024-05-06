@@ -54,6 +54,15 @@ class Handler extends ExceptionHandler
                 ], 422);
             }
         });
+        $this->renderable(function (AgendamentoDuplicadoException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'error' => [
+                        'message' => $e->getMessage(),
+                    ],
+                ], 422);
+            }
+        });
 
     }
 }
