@@ -3,9 +3,13 @@
 namespace App\Filament\Resources;
 
 use App\Enum\RolesEnum;
+use App\Enum\Semanas;
 use App\Filament\Resources\UserResource\Pages;
+use App\Models\Agenda;
+use App\Models\Horario;
 use App\Models\User;
 use Filament\Forms;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -48,6 +52,22 @@ class UserResource extends Resource
                             };
                         },
                     ]),
+
+                Forms\Components\Repeater::
+                    make('horarios')
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                \Filament\Forms\Components\Select::make('dia_semana')
+                                    ->label('Dia da Semana')
+                                    ->options(array_map(fn($item) => [$item->name => $item->name], Semanas::cases())),
+                                Forms\Components\Select::make('horario')
+                                ->label('Horário')
+                                ->options(Horario::selectRaw('DISTINCT horario')->get()->map(fn(Horario $h) => [
+                                    $h->horario => $h->horario
+                                ]))
+                            ])
+                    ])
             ]);
     }
 

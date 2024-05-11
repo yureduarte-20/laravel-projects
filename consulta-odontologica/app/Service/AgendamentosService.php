@@ -14,12 +14,15 @@ use App\Models\Consulta;
 use App\Models\Horario;
 use App\Models\User;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 
 class AgendamentosService
 {
-    public function getAgendamentos($user_id)
+    public function getConsultasEmAberto(int $agenda_id = null) : Collection
     {
-        // TODO: Implementar getAgendamentos
+        return Consulta::when($agenda_id, fn($query) => $query->where('agenda_id', $agenda_id))
+        ->with(['user', 'horario'])
+        ->whereIn('status', [ StatusConsulta::AGENDADO->name, StatusConsulta::ADIADA->name ])->get();
     }
 
     public function agendar(AgendamentoDTO $agendamento): Consulta

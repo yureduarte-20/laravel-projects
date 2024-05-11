@@ -18,7 +18,7 @@ class Horario extends Model
             ->withTimestamps();
     }
 
-    protected $fillable = ['agenda_id', 'horario_id'];
+    protected $fillable = ['dia_semana', 'horario'];
 
     protected $casts = [
         'dia_semana' => Semanas::class,
