@@ -25,33 +25,21 @@ class EditUser extends EditRecord
     protected function mutateFormDataBeforeFill(array $data): array
     {
         $user = User::find($data["id"]);
-        if ($user->has('agenda')->exists()) {
-            $data['horarios'] = [];
-            foreach ($user->agenda->horarios as $horario) {
-                array_push(
-                    $data['horarios'],
-                    [
-                        'dia_semana' => $horario->dia_semana->name,
-                        'horario' => $horario->horario,
-                    ]
-                );
-            }
-        }
 
+        if ($user->has('agenda')->exists()) {
+            $data['horarios'] = $user->agenda->horarios->pluck('id')->toArray();
+        }
         return $data;
     }
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        if($record->has('agenda')->exists() ){
-            $agenda =  $record->agenda;
-            $horarios = [];
-            foreach($data['horarios'] as $data_horario)
-            {
-                $horarios[] = Horario::where('horario', $data_horario['horario'])
-                ->where('dia_semana', $data_horario['dia_semana'])->first()->id;
-            }
-            $agenda->horarios()->sync($horarios);
+
+        if($record->has('agenda')->exists() or Role::whereIn('id', $data['roles'])->get()->some(fn (Role $role) => $role->name == RolesEnum::ODONTOLOGO ) ){
+             $agenda = $record->agenda()->firstOrCreate();
+             $agenda->horarios()->sync($data['horarios']);
         }
+        $record->fill($data)->save();
+        $record->roles()->sync($data['roles']);
         return $record;
     }
 }

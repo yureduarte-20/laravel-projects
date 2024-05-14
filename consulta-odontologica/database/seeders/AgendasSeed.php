@@ -38,7 +38,7 @@ class AgendasSeed extends Seeder
         foreach (Semanas::cases() as $semana) {
             foreach ($timeRange as $time) {
                 Horario::create([
-                    'dia_semana' => $semana,
+                    'dia_semana' => $semana->name,
                     'horario' => $time,
                 ]);
             }

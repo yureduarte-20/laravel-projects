@@ -28,6 +28,9 @@ class Rental extends Model
         'rental_date' => 'datetime',
         'expected_return' => 'datetime',
         'returned_at' => 'datetime',
+        'expected_rental' => 'datetime',
+        'estimated_cost' => 'float',
+        'total_cost' => 'float'
 
     ];
 
@@ -39,6 +42,7 @@ class Rental extends Model
     }
     public function scopeLateRentals(Builder $builder):void{
         $builder->whereDate('expected_return', '<',  Carbon::now())
+                ->where('status', '=', RentalStatus::LATE->value)
                 ->whereNull('returned_at');
     }
     public function scopeStatus(Builder $builder, RentalStatus $status):void{

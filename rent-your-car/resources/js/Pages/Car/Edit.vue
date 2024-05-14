@@ -3,16 +3,28 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
+import DangerButton from '@/Components/DangerButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import Checkbox from "@/Components/Checkbox.vue";
-import {Link, useForm} from "@inertiajs/vue3";
+import {Link, router, useForm} from "@inertiajs/vue3";
+import Modal from "@/Components/Modal.vue";
+import { ref } from "vue";
+const confirmingUserDeletion = ref(false);
 
+const closeModal = () => confirmingUserDeletion.value = false
 const props = defineProps({
     car: {
         type: Object,
         required: true
     }
 })
+
+const deleteCar = () =>{
+    router.delete(route('admin.car.destroy', props.car.id), {
+        onSuccess: () => console.log('deletado com sucesso'),
+        onError: console.error
+     })
+}
 
 const form = useForm({
     plate: props.car.plate,
@@ -128,7 +140,11 @@ const submit = () => {
                         </div>
 
                         <div class="flex items-center justify-end mt-4">
-                            <PrimaryButton class="ms-4" :class="{ 'opacity-25': form.processing }"
+                            <DangerButton @click="confirmingUserDeletion = true" class="ms-4" :class="{ 'opacity-25': form.processing }"
+                                        >
+                            Deletar
+                            </DangerButton>
+                            <PrimaryButton type="submit" class="ms-4" :class="{ 'opacity-25': form.processing }"
                                            :disabled="form.processing">
                                 Atualizar
                             </PrimaryButton>
@@ -137,5 +153,29 @@ const submit = () => {
                 </div>
             </div>
         </div>
+        <Modal :show="confirmingUserDeletion" @close="closeModal">
+            <div class="p-6">
+                <h2 class="text-lg font-medium text-gray-900">
+                   Você tem certeza que deseja apagar este carro?
+                </h2>
+
+                <p class="mt-1 text-sm text-gray-600">
+                    Todos os emprestimos associados a ele também serão excluídos
+                </p>
+
+                <div class="mt-6 flex justify-end">
+                    <SecondaryButton @click="closeModal"> Cancel </SecondaryButton>
+
+                    <DangerButton
+                        class="ms-3"
+                        :class="{ 'opacity-25': form.processing }"
+                        :disabled="form.processing"
+                        @click="deleteCar"
+                    >
+                        Apagar carro
+                    </DangerButton>
+                </div>
+            </div>
+        </Modal>
     </AuthenticatedLayout>
 </template>

@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Car;
 use App\Models\Price;
+use App\Models\Rental;
+use App\RentalStatus;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
@@ -47,6 +50,7 @@ class CarController extends Controller
      */
     public function index()
     {
+
         return Inertia::render('Car/Index', [
             'cars' => Car::paginate()->withQueryString()
         ]);
@@ -114,7 +118,7 @@ class CarController extends Controller
             $car->update($validated);
             $car->price()->update($validated['price']);
             DB::commit();
-            return Redirect::route('admin.car.index');
+            return Redirect::route('admin.car.index')->with('success', 'atualizados com sucesso');
         } catch (\Throwable $e) {
             DB::rollBack();
             return Redirect::route('admin.car.index');
@@ -126,6 +130,7 @@ class CarController extends Controller
      */
     public function destroy(Car $car)
     {
-        //
+        Car::destroy($car->id);
+        return Redirect::route('admin.car.index')->with('success', 'deletado com sucesso');
     }
 }

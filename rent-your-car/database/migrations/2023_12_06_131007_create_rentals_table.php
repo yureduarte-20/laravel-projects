@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignIdFor(\App\Models\Car::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(\App\Models\User::class)->constrained()->cascadeOnDelete();
-            $table->timestamp('rental_date')->default(now());
+            $table->timestamp('rental_date')->nullable();
             $table->dateTime('expected_rental');
             $table->dateTime('expected_return');
             $table->timestamp('returned_at')->nullable();

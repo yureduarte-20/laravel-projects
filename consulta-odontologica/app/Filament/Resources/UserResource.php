@@ -14,7 +14,9 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\Models\Role;
+use Symfony\Component\Mime\Part\Multipart\MixedPart;
 
 class UserResource extends Resource
 {
@@ -39,10 +41,12 @@ class UserResource extends Resource
                 Forms\Components\Select::make('roles')
                     ->required()
                     ->label('Papel no sistema')
+                    ->native(false)
                     ->relationship('roles', 'name'),
                 Forms\Components\Select::make('especialidades')
                     ->relationship('especialidades', 'nome')
                     ->multiple()
+                    ->native(false)
                     ->rules([
                         function ($get) {
                             return function (string $atribute, $value, \Closure $fail) use ($get) {
@@ -52,22 +56,23 @@ class UserResource extends Resource
                             };
                         },
                     ]),
-
-                Forms\Components\Repeater::
-                    make('horarios')
-                    ->schema([
-                        Grid::make(2)
-                            ->schema([
-                                \Filament\Forms\Components\Select::make('dia_semana')
-                                    ->label('Dia da Semana')
-                                    ->options(array_map(fn($item) => [$item->name => $item->name], Semanas::cases())),
-                                Forms\Components\Select::make('horario')
-                                ->label('Horário')
-                                ->options(Horario::selectRaw('DISTINCT horario')->get()->map(fn(Horario $h) => [
-                                    $h->horario => $h->horario
-                                ]))
-                            ])
+                Forms\Components\Select::make('horarios')
+                    ->multiple()
+                    ->searchable()
+                    ->preload()
+                    ->rules([
+                        function ($get) {
+                            return function (string $atribute, $value, \Closure $fail) use ($get) {
+                                if ($get('roles') == Role::findByName(RolesEnum::ODONTOLOGO->name)->id && count($value) <= 0) {
+                                    $fail('Para odontólogos é obrigatório adicionar suas especialidades');
+                                }
+                            };
+                        },
                     ])
+                    ->options(Horario::all([ 'id', 'dia_semana', 'horario' ])
+                        ->pluck('label_option', 'id')
+                        ->toArray())
+                ,
             ]);
     }
 

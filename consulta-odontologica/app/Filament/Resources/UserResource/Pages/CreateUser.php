@@ -19,21 +19,15 @@ class CreateUser extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['password'] = Hash::make($data['password']);
-
+        dd($data);
         return $data;
     }
     protected function handleRecordCreation(array $data): Model
     {
         $user = User::create($data);
-        if(Role::findById($data['roles'])->name === RolesEnum::ODONTOLOGO->name ){
-            $agenda =  $user->agenda()->create();
-            $horarios = [];
-            foreach($data['horarios'] as $data_horario)
-            {
-                $horarios[] = Horario::where('horario', $data_horario['horario'])
-                ->where('dia_semana', $data_horario['dia_semana'])->first()->id;
-            }
-            $agenda->horarios()->sync($horarios);
+        if( Role::findById($data['roles'])->name === RolesEnum::ODONTOLOGO->name  ){
+            $agenda =  $user->agenda()->firstOrCreate();
+            $agenda->horarios()->sync($data['horarios']);
         }
         return $user;
     }

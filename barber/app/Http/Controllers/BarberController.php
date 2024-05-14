@@ -141,6 +141,7 @@ class BarberController extends Controller
      */
     public function destroy(Barber $barber)
     {
-        //
+        $barber->delete();
+        return Redirect::to(route('barber.index'));
     }
 }

@@ -10,7 +10,6 @@ const props = defineProps({
         required: true
     }
 });
-console.log(props.cars)
 </script>
 
 <template>

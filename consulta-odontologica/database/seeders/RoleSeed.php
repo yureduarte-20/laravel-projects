@@ -13,8 +13,8 @@ class RoleSeed extends Seeder
      */
     public function run(): void
     {
-        Role::findOrCreate(RolesEnum::ADMIN->name);
-        Role::findOrCreate(RolesEnum::ODONTOLOGO->name);
-        Role::findOrCreate(RolesEnum::PACIENTE->name);
+        foreach(RolesEnum::cases() as $role) {
+            Role::findOrCreate($role->name);
+        }
     }
 }

@@ -21,7 +21,6 @@ class Car extends Model
       'is_available',
       'plate'
     ];
-
     public function rentals() : HasMany {
         return $this->hasMany(Rental::class);
     }

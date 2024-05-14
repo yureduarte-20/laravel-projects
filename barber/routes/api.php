@@ -17,6 +17,7 @@ use \Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+Route::get('appointments', [\App\Http\Controllers\Api\AppointmentController::class, 'index']);
 Route::post('/signup', [\App\Http\Controllers\Api\Auth\RegisterController::class, 'registerNewCustomer']);
 Route::post('/token', function (Request $request) {
     $request->validate([
