@@ -35,7 +35,7 @@ class AgendamentosService
         $dia = Carbon::createFromFormat('Y-m-d', $agendamento->dia);
 
         $dias = Semanas::cases();
-        $dia_semana = $dias[$dia->dayOfWeek];
+        $dia_semana = $dias[$dia->dayOfWeek]->name;
 
         if (! $agenda->horarios()->where(['horario_id' => $agendamento->horario_id])->exists()) {
             throw new SemHorariosDisponivelException("Odontólogo não possui horário disponível para esse dia.");
@@ -52,7 +52,7 @@ class AgendamentosService
         }
         $dia_atendimento = Horario::find($agendamento->horario_id);
         if ($dia_atendimento->dia_semana != $dia_semana) {
-            throw new SemHorariosDisponivelException("O dia agendado não condiz com o dia da semana, {$agendamento->dia} é {$dia->dayOfWeek} {$dia_semana->name} e o horário solicitado é para {$dia_atendimento->dia_semana?->name}");
+            throw new SemHorariosDisponivelException("O dia agendado não condiz com o dia da semana, {$agendamento->dia} é {$dia->dayOfWeek} {$dia_semana} e o horário solicitado é para {$dia_atendimento->dia_semana}");
         }
         if($paciente->consultas()->whereIn('status', [StatusConsulta::AGENDADO->name, StatusConsulta::ADIADA->name] )->exists()){
             throw new AgendamentoDuplicadoException("Você tem consultas pendentes, portanto não pode realizar outra sem finalizar a anterior");

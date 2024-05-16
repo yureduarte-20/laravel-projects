@@ -17,7 +17,7 @@ use App\Service\AgendamentosService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class AgendaTest extends TestCase
+class AgendamentosServiceTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -37,6 +37,7 @@ class AgendaTest extends TestCase
 
     public function test_agendas_disponibilidade(): void
     {
+        // Arrange
         $this->seed();
         $this->assertDatabaseHas('users', [
             'email' => 'yure@gmail.com',
@@ -44,10 +45,17 @@ class AgendaTest extends TestCase
         $user = User::where([
             'email' => 'yure@gmail.com',
         ])->first();
+        // Act
         $agenda = Agenda::newModelInstance(['user_id' => $user->id]);
         $agenda->user()->associate($user);
         $agenda->save();
+        // Assert
         $this->assertEquals($user->agenda->id, $agenda->id);
+        $this->assertDatabaseHas(Agenda::newModelInstance()->getTable(), [
+            'user_id' => $user->id,
+            'id' => $agenda->id,
+        ]);
+
 
     }
 

@@ -47,7 +47,7 @@ class AgendamentoController extends Controller
         ]);
 
         $consulta = $this->agendamentosService->agendar($agendamento);
-
+        $consulta->load('horario');
         return response()->json($consulta, 201);
     }
 }
